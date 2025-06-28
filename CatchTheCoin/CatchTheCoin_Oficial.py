@@ -1,16 +1,18 @@
-##########################################################
-####        N A V I O    C A T A    M O E D A S       ####
-##########################################################
-#### Prof. Filipo Novo Mor - filipomor.com            ####
-#### github.com/ProfessorFilipo                       ####
-##########################################################
+#
+# CATCH THE COINS: A CACHORRINHA QUE CAÇA MOEDAS
+#
+# Nome: Milena Cardoso Lopes
+# Professor: Filipo Novo
+# Disciplina: Algoritmos e Programação
+# Curso: Ciência da Computação
+#
 import pygame
 import random
 import sys
 
 pygame.init()
 
-#  carrega os sons
+# Carregar os sons
 som_aviso = pygame.mixer.Sound(r'Assets/Audio/latido.mp3') #trocar por latido
 som_beep = pygame.mixer.Sound(r'Assets/Audio/beep.mp3')
 
@@ -19,54 +21,33 @@ pygame.mixer.music.load(r'Assets/Audio/musicafundo.mp3')  # Caminho da música
 pygame.mixer.music.set_volume(0.5)  # Opcional: ajuste o volume entre 0.0 e 1.0
 pygame.mixer.music.play(-1, 0.0)  # Toca a música em loop (o '-1' significa loop infinito)
 
-#
 # Configurações iniciais
-#
 info = pygame.display.Info()
 WIDTH, HEIGHT = info.current_w, info.current_h
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
-#WIDTH, HEIGHT = 1366, 768
-#screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Navio Cata Moedas!!!")
 clock = pygame.time.Clock()
 FONT = pygame.font.SysFont(None, 36)
-MOEDA_TAMANHO = (30, 30)
+MOEDA_TAMANHO = (25, 25)
 
-# Carregar a imagem do fundo (altere o caminho para sua imagem real)
-#background_img = pygame.image.load(r'Assets/PNG/parque1.png').convert()
-# === Fundos dos níveis ===
+# Carregar a imagem do fundo de acordo com o nível
 backgrounds = {
     1: pygame.transform.smoothscale(pygame.image.load(r'Assets/PNG/parque2.png').convert_alpha(), (WIDTH, HEIGHT)),
-    2: pygame.transform.smoothscale(pygame.image.load(r'Assets/PNG/parque6.png').convert_alpha(), (WIDTH, HEIGHT)),
-    3: pygame.transform.smoothscale(pygame.image.load(r'Assets/PNG/parque3.png').convert_alpha(), (WIDTH, HEIGHT)),
-    4: pygame.transform.smoothscale(pygame.image.load(r'Assets/PNG/parque4.png').convert_alpha(), (WIDTH, HEIGHT))
+    2: pygame.transform.smoothscale(pygame.image.load(r'Assets/PNG/parque1.png').convert_alpha(), (WIDTH, HEIGHT)),
+    3: pygame.transform.smoothscale(pygame.image.load(r'Assets/PNG/parque4.png').convert_alpha(), (WIDTH, HEIGHT)),
+    4: pygame.transform.smoothscale(pygame.image.load(r'Assets/PNG/parque3.png').convert_alpha(), (WIDTH, HEIGHT))
 }
 
-
-#porto
 # Casinha (porto)
 casinha_img = pygame.image.load(r'Assets/PNG/casinha1.png').convert_alpha()
 casinha_img = pygame.transform.smoothscale(casinha_img, (300, 300))  # Tamanho ajustável
 casinha_rect = casinha_img.get_rect(bottomright=(WIDTH - 10, HEIGHT - 100))
-#acrescento a imagem
-#posição .left = largura da tela - largura do sprite get_width
 
-# # barco
-# barco_sprite_img = pygame.image.load(r'Assets/PNG/cachorrinha3.png').convert_alpha()
-# # Opcionalmente, ajuste o tamanho do sprite
-# #barco_sprite_img = pygame.transform.smoothscale(barco_sprite_img, (360, 180))
-#
-# # Reduz a imagem para 30% do tamanho original, mantendo a proporção
-# escala = 0.4  # ou 0.25, 0.4... depende do tamanho ideal que você quer
-# largura = int(barco_sprite_img.get_width() * escala)
-# altura = int(barco_sprite_img.get_height() * escala)
-# barco_sprite_img = pygame.transform.smoothscale(barco_sprite_img, (largura, altura))
-
-# Carrega a imagem base da cachorrinha
+# Carregar a imagem base da cachorrinha
 img_direita = pygame.image.load(r'Assets/PNG/cachorrinha1.png').convert_alpha()
 
-# Reduz para 40% mantendo a proporção
-escala = 0.4
+# Proporção da imagem da cachorrinha
+escala = 0.35
 largura = int(img_direita.get_width() * escala)
 altura = int(img_direita.get_height() * escala)
 img_direita = pygame.transform.smoothscale(img_direita, (largura, altura))
@@ -74,15 +55,7 @@ img_direita = pygame.transform.smoothscale(img_direita, (largura, altura))
 # Gera automaticamente a versão espelhada para o lado esquerdo
 img_esquerda = pygame.transform.flip(img_direita, True, False)
 
-
-#mar
-sea_sprite = pygame.image.load(r'Assets/PNG/mar001.png').convert()
-sea_sprite = pygame.transform.smoothscale(sea_sprite, (WIDTH, sea_sprite.get_height()))
-sea_rect = sea_sprite.get_rect(topleft=(0, HEIGHT - sea_sprite.get_height()))
-
-#
 # Função para configurar a dificuldade
-#
 def configurar_dificuldade(nivel):
     if nivel == 1:
         qtd_moedas = 15
@@ -183,17 +156,15 @@ class Barco(pygame.sprite.Sprite):
         self.rect.midbottom = (WIDTH // 2, HEIGHT - 120)
         self.carga = 0
 
-
-#
 # Variáveis de controle
-#
 nivel = 1
 qtd_moedas, v_min, v_max = configurar_dificuldade(nivel)
 moedas = pygame.sprite.Group()
 em_descarga = False
-tempo_descarga = 0
 pontos = 0
 mostrar_casinha = False
+jogo_finalizado = False
+
 
 # Criar moedas iniciais
 for _ in range(qtd_moedas):
@@ -205,9 +176,7 @@ for _ in range(qtd_moedas):
 # Instanciar o barco
 barco = Barco()
 
-#
 # Loop principal do jogo
-#
 running = True
 while running:
     clock.tick(60)  # 60 frames por segundo
@@ -220,60 +189,44 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
 
+            # Reinicia todas as variáveis do jogo
+            if jogo_finalizado and event.key == pygame.K_r:
+                nivel = 1
+                qtd_moedas, v_min, v_max = configurar_dificuldade(nivel)
+                moedas.empty()
+                for _ in range(qtd_moedas):
+                    tipo = random.choice(['ouro', 'prata', 'bronze'])
+                    x = random.randint(0, WIDTH - 20)
+                    y = random.randint(-100, -10)
+                    moedas.add(Moeda(x, y, tipo))
+                barco.voltar_ao_porto()
+                barco.carga = 0
+                pontos = 0
+                em_descarga = False
+                mostrar_casinha = False
+                jogo_finalizado = False
 
     keys = pygame.key.get_pressed()
 
-    # # Se o barco estiver carregando até o limite, inicia o descarregamento
-    # if not em_descarga and barco.carga >= barco.max_carga:
-    #     som_aviso.play()
-    #
-    #     # Cria uma lista das moedas no céu (fora do alcance do barco)
-    #     moedas_no_ceu = [m for m in moedas if m.rect.y < HEIGHT / 2]
-    #     while moedas_no_ceu:
-    #         moeda_remover = moedas_no_ceu.pop()
-    #         moedas.remove(moeda_remover)
-    #
-    #         # Conta 1 ponto negativo por moeda removida
-    #         pontos -= 1
-    #         if pontos < 0:
-    #             pontos = 0
-    #
-    #     em_descarga = True
-    #     tempo_descarga = pygame.time.get_ticks()
-
-    # # Se o barco estiver carregando até o limite, inicia o descarregamento
-    if not em_descarga and barco.carga >= barco.max_carga:
+# Se o barco estiver carregando até o limite, inicia o descarregamento
+    if not em_descarga and barco.carga >= barco.max_carga and not jogo_finalizado:
         som_aviso.play()
-        mostrar_casinha = True  # mostra a casinha
-        em_descarga = True  # ativa modo de descarregamento (congela o jogo)
-
-
-    # # Verifica se o barco encostou na casinha para descarregar
-    # if em_descarga and mostrar_casinha:
-    #     if barco.rect.colliderect(casinha_rect):
-    #         barco.voltar_ao_porto()
-    #         barco.carga = 0
-    #         em_descarga = False
-    #         mostrar_casinha = False
-    #
-    #         nivel += 1
-    #         if nivel > 4:
-    #             nivel = 4
-    #         qtd_moedas, v_min, v_max = configurar_dificuldade(nivel)
+        mostrar_casinha = True
+        em_descarga = True
 
     # Atualiza movimento do barco
     barco.update(keys)
 
-    # Atualiza as moedas apenas se o barco não estiver descarregando
+# Atualiza as moedas apenas se o barco não estiver descarregando
     if not em_descarga:
         moedas.update()
 
-        # Detecta colisões entre o barco e as moedas
-        colisoes = pygame.sprite.spritecollide(barco, moedas, True)
-        for moeda in colisoes:
-            barco.carga += VALOR_MOEDAS[moeda.tipo]
-            som_beep.play()
-            pontos += 1
+    # Permite que o barco continue coletando moedas mesmo em modo de descarregamento
+    colisoes = pygame.sprite.spritecollide(barco, moedas, True)
+    for moeda in colisoes:
+        barco.carga += VALOR_MOEDAS[moeda.tipo]
+        som_beep.play()
+        pontos += 1
 
     # Garantir que o número de moedas esteja constante apenas quando não estiver em descarregamento
     if not em_descarga and len(moedas) < qtd_moedas:
@@ -282,13 +235,6 @@ while running:
         y = random.randint(-100, -10)
         moedas.add(Moeda(x, y, tipo))
 
-
-    # Detecta colisões entre o barco e as moedas
-    colisoes = pygame.sprite.spritecollide(barco, moedas, True)
-    for moeda in colisoes:
-        barco.carga += VALOR_MOEDAS[moeda.tipo]
-        som_beep.play()
-        pontos += 1
         # Após capturar uma moeda, cria uma nova
         '''tipo_random = random.choice(['ouro', 'prata', 'bronze'])
         x = random.randint(0, WIDTH - 20)
@@ -296,20 +242,14 @@ while running:
         moedas.add(Moeda(x, y, tipo_random)) '''
 
 
-    # Garantir que o número de moedas esteja constante
+# Garantir que o número de moedas esteja constante
     while len(moedas) < qtd_moedas:
         tipo = random.choice(['ouro', 'prata', 'bronze'])
         x = random.randint(0, WIDTH - 20)
         y = random.randint(-100, -10)
         moedas.add(Moeda(x, y, tipo))
 
-    #
-    # Desenhar a tela
-    #
-    #
-    # Desenhar a tela
-    #
-    #screen.blit(sea_sprite, sea_rect)  # Desenha o mar primeiro
+# Desenhar a tela
     screen.blit(backgrounds[nivel], (0, 0))  # Muda o fundo conforme o nível
     if mostrar_casinha:
         screen.blit(casinha_img, casinha_rect)
@@ -319,44 +259,47 @@ while running:
     moedas.draw(screen)
     screen.blit(barco.image, barco.rect)
 
-    # Mostrar quantidade de moedas capturadas
+# Mostrar quantidade de moedas capturadas
     info_text = f'Moedas: {barco.carga}/{barco.max_carga}'
     nivel_text = f'Nível: {nivel}'
     screen.blit(FONT.render(info_text, True, (255, 255, 255)), (10, 10))
     screen.blit(FONT.render(nivel_text, True, (255, 255, 255)), (10, 50))
 
-    # Mostrar instruções de descarregamento
-    if em_descarga and mostrar_casinha:
+# Mostrar instruções de descarregamento
+    if em_descarga and mostrar_casinha and not jogo_finalizado:
         if barco.rect.colliderect(casinha_rect):
             msg = FONT.render("Pressione 'E' para descarregar", True, (255, 255, 0))
         else:
             msg = FONT.render("Vá até a casinha para descarregar", True, (255, 255, 255))
         screen.blit(msg, (WIDTH // 2 - msg.get_width() // 2, HEIGHT - 70))
 
-    # # NOVO BLOCO: verifica se encostou na casinha para descarregar
-    # if em_descarga and mostrar_casinha:
-    #     if barco.rect.colliderect(casinha_rect):
-    #         barco.voltar_ao_porto()  # Volta ao porto para descarregar
-    #         barco.carga = 0  # Limpa a carga do barco
-    #         em_descarga = False  # Desativa o estado de descarregamento
-    #         mostrar_casinha = False  # Oculta a casinha
-    #
-    #         nivel += 1  # Avança para o próximo nível
-    #         if nivel > 4:  # Limita o nível máximo a 4
-    #             nivel = 4
-    #         qtd_moedas, v_min, v_max = configurar_dificuldade(nivel)  # Atualiza a dificuldade
-
+    # Bloco de Descarregamento e Passagem de Fase
     if em_descarga and mostrar_casinha and barco.rect.colliderect(casinha_rect):
         if keys[pygame.K_e]:
-            barco.voltar_ao_porto()
-            barco.carga = 0
-            em_descarga = False
-            mostrar_casinha = False
+            if nivel < 4:
+                barco.voltar_ao_porto()
+                barco.carga = 0
+                em_descarga = False
+                mostrar_casinha = False
 
-            nivel += 1
-            if nivel > 4:
-                nivel = 4
-            qtd_moedas, v_min, v_max = configurar_dificuldade(nivel)
+                nivel += 1
+                qtd_moedas, v_min, v_max = configurar_dificuldade(nivel)
+            else:
+                jogo_finalizado = True
+                em_descarga = False
+                mostrar_casinha = False
+
+    # Mostrar mensagem de reinício quando o jogo finalizar
+    if jogo_finalizado:
+        texto_parabens = FONT.render("Parabéns! Você concluiu todos os níveis!", True, (0, 0, 0))
+        texto_reiniciar = FONT.render("Pressione 'R' para reiniciar o jogo.", True, (0, 0, 0))
+
+        # Centralizar horizontalmente e empilhar verticalmente
+        x_central = WIDTH // 2
+        y_central = HEIGHT // 2
+
+        screen.blit(texto_parabens, (x_central - texto_parabens.get_width() // 2, y_central - 30))
+        screen.blit(texto_reiniciar, (x_central - texto_reiniciar.get_width() // 2, y_central + 10))
 
     # Atualiza a tela
     pygame.display.flip()
