@@ -28,7 +28,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
 pygame.display.set_caption("Navio Cata Moedas!!!")
 clock = pygame.time.Clock()
 FONT = pygame.font.SysFont(None, 36)
-MOEDA_TAMANHO = (25, 25)
+MOEDA_TAMANHO = (35, 35)
 
 # Carregar a imagem do fundo de acordo com o nível
 backgrounds = {
@@ -89,9 +89,9 @@ def load_animation_frames(prefix, total_frames=10, tamanho=MOEDA_TAMANHO):
     return frames
 
 # Carregar sprites das moedas (alterar caminhos conforme seus arquivos)
-ouro_frames   = load_animation_frames(r"Assets\PNG\Gold\Gold")
-prata_frames  = load_animation_frames(r"Assets\PNG\Silver\Silver")
-bronze_frames = load_animation_frames(r"Assets\PNG\Bronze\Bronze")
+ouro_frames   = load_animation_frames(r"Assets\PNG\ossoouro\ossoouro")
+prata_frames  = load_animation_frames(r"Assets\PNG\ossoprata\ossoprata")
+bronze_frames = load_animation_frames(r"Assets\PNG\ossobronze\ossobronze")
 VALOR_MOEDAS  = {'ouro': 10, 'prata': 5, 'bronze': 1}
 
 # Classe das moedas animadas
