@@ -47,7 +47,7 @@ casinha_rect = casinha_img.get_rect(bottomright=(WIDTH - 10, HEIGHT - 100))
 img_direita = pygame.image.load(r'Assets/PNG/cachorrinha1.png').convert_alpha()
 
 # Proporção da imagem da cachorrinha
-escala = 0.35
+escala = 0.3
 largura = int(img_direita.get_width() * escala)
 altura = int(img_direita.get_height() * escala)
 img_direita = pygame.transform.smoothscale(img_direita, (largura, altura))
@@ -58,7 +58,7 @@ img_esquerda = pygame.transform.flip(img_direita, True, False)
 # Função para configurar a dificuldade
 def configurar_dificuldade(nivel):
     if nivel == 1:
-        qtd_moedas = 15
+        qtd_moedas = 30
         v_min = 2
         v_max = 3
     elif nivel == 2:
@@ -66,11 +66,11 @@ def configurar_dificuldade(nivel):
         v_min = 3
         v_max = 4
     elif nivel == 3:
-        qtd_moedas = 35
+        qtd_moedas = 20
         v_min = 4
         v_max = 6
     elif nivel == 4:
-        qtd_moedas = 45
+        qtd_moedas = 15
         v_min = 6
         v_max = 8
     else:
@@ -133,7 +133,7 @@ class Barco(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=(WIDTH//2, HEIGHT - 120))
         self.speed = 8
         self.carga = 0
-        self.max_carga = 100
+        self.max_carga = 200
 
     def update(self, keys_pressed):
         if keys_pressed[pygame.K_LEFT]:
